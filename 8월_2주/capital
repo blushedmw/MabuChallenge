@@ -2,9 +2,12 @@
 states <- states %>%
 	mutate(accord = ifelse(capital_city==largest_city, 'O', 'X'))
 
-plot_usmap(data = states, values = "accord",labels=TRUE) +
+plot_usmap(data = states, values = "accord",labels=TRUE, exclude="DC") +
   scale_fill_manual(values = c("darkgreen","pink"), name = "Same?") +
-  labs(title="States whose capital city is the largest city", subtitle = "Capital=Largest : Dark green / Capital!=Largest : pink")
+  labs(title="States whose capital city is the largest city", subtitle = "Capital=Largest : Dark green / Capital!=Largest : pink") +
+  theme(plot.title = element_text(size = 16, face ="bold", margin = margin(0,0,10,0), hjust=0.5),
+        plot.subtitle = element_text(size = 10, face ="bold", margin = margin(0,0,10,0), hjust=0.5))
+
 
 #한국_도청소재지와 최대도시가 일치하는 도
 library(sf)
@@ -21,4 +24,8 @@ df_kor_map %>% mutate(accord = case_when(
   scale_fill_manual(values = c('grey50','darkgreen','pink'), name="Same?") +
   labs(title="도청 소재지와 최대도시가 일치하는 지역", subtitle = "Capital=Largest : Dark green / Capital!=Largest : pink / 도가 아닌 지역 : grey") +
   theme_minimal() +
-  theme(text = element_text(family = "AppleGothic"))
+  theme(text = element_text(family = "AppleGothic"),
+        panel.grid.major = element_blank(),
+        axis.text = element_blank(),
+        plot.title = element_text(size = 16, margin = margin(0,0,10,0), hjust=0.5),
+        plot.subtitle = element_text(size = 10, margin = margin(0,0,10,0), hjust=0.5)
