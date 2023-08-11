@@ -1,0 +1,38 @@
+install.packages("usmap")
+library(usmap)
+
+states <- read_csv('states.csv')
+
+#주별 인구_지도
+plot_usmap(data = states, values = "population_2020", color="blue") +
+  scale_fill_continuous(low = "white", high = "blue", name = "Population", label = scales::comma) +
+  labs(title="US population by states in 2020")
+
+#인구 top 5 (big, small)
+states %>% filter(population_2020>=13002700 | population_2020<=886667) %>%
+  mutate(color=ifelse(population_2020>13000000, "big", "small")) %>%
+  ggplot(aes(x=reorder(state,-population_2020), y=population_2020, fill=color)) +
+  geom_col() +
+  scale_fill_manual(values = c("blue","lightblue"), name = "Population") +
+  geom_text(aes(label=state), vjust=-1) +
+  scale_y_continuous(label=scales::comma) +
+  labs(title="Top 5 biggest, Top 5 smallest", x="state", y="population(2020)") +
+  theme_minimal()
+
+#인구 단계구분도_땅덩어리에 비해서는?
+states <- states %>% mutate(pop_ratio = population_2020/land_area_mi2) 
+
+plot_usmap(data = states, values = "pop_ratio") +
+  scale_fill_continuous(low = "white", high = "blue", name = "Population in 1 square mile(land)", label = scales::comma) +
+  labs(title="US population in 1 square mile (land) by states in 2020")
+
+#땅 1 mi^2 당 인구 top 5 (big, small)
+states %>% filter(pop_ratio>600 | pop_ratio<12) %>%
+  mutate(color=ifelse(pop_ratio>600, "big", "small")) %>%
+  ggplot(aes(x=reorder(state,-pop_ratio), y=pop_ratio, fill=color)) +
+  geom_col() +
+  scale_fill_manual(values = c("blue","lightblue"), name = "Population in 1 square mile(land)") +
+  geom_text(aes(label=state), vjust=-1) +
+  scale_y_continuous(label=scales::comma) +
+  labs(title="Top 5 biggest, Top 5 smallest", x="state", y="population(2020) in 1 square mile(land)") +
+  theme_minimal()
