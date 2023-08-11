@@ -1,0 +1,24 @@
+#미국_주도와 최대도시가 일치하는 주
+states <- states %>%
+	mutate(accord = ifelse(capital_city==largest_city, 'O', 'X'))
+
+plot_usmap(data = states, values = "accord",labels=TRUE) +
+  scale_fill_manual(values = c("darkgreen","pink"), name = "Same?") +
+  labs(title="States whose capital city is the largest city", subtitle = "Capital=Largest : Dark green / Capital!=Largest : pink")
+
+#한국_도청소재지와 최대도시가 일치하는 도
+library(sf)
+kor_map <- st_read('ctprvn.shp')
+df_kor_map <- fortify(kor_map)
+
+df_kor_map %>% mutate(accord = case_when(
+  (CTP_ENG_NM=="Gyeonggi-do"|CTP_ENG_NM=="Chungcheongbuk-do"|CTP_ENG_NM=="Gyeongsangnam-do"|CTP_ENG_NM=="Jeollabuk-do"|CTP_ENG_NM=="Jeju-do")~"O",
+  (CTP_ENG_NM=="Gangwon-do"|CTP_ENG_NM=="Chungcheongnam-do"|CTP_ENG_NM=="Gyeongsangbuk-do"|CTP_ENG_NM=="Jellanam-do")~"X",
+  TRUE~"-"
+)) %>%
+  ggplot(aes(fill=accord)) +
+  geom_sf(mapping=aes(geometry = geometry)) +
+  scale_fill_manual(values = c('grey50','darkgreen','pink'), name="Same?") +
+  labs(title="도청 소재지와 최대도시가 일치하는 지역", subtitle = "Capital=Largest : Dark green / Capital!=Largest : pink / 도가 아닌 지역 : grey") +
+  theme_minimal() +
+  theme(text = element_text(family = "AppleGothic"))
