@@ -1,0 +1,16 @@
+library(stringr)
+states <- states %>%
+  mutate(demonym_kind = case_when(
+    (demonym %in% c("Alabamian","Floridian","Louisianian","Oregonian","North Carolinian","South Carolinian","Kentuckian","Oregonian","Washingtonian")) ~ 'ian',
+    str_sub(demonym, -2,-1)=='an' ~ 'an',
+    str_sub(demonym, -2,-1)=='hn' ~ 'an',
+    str_sub(demonym, -2,-1)=='er' ~ 'er',
+    str_sub(demonym, -2,-1)=='te' ~ 'ite',
+    TRUE ~ 'resident'
+  ))
+
+plot_usmap(data = states, values = "demonym_kind", labels=TRUE, exclude="DC") +
+  scale_fill_manual(values = c("#A6AAFF","#3DC2A6","#28AAC9","#307AF2","#EE7D58"), name = "Who are you?") +
+  labs(title="What should we use to call 'American'?", subtitle = "Rather using 'American', let's call them by their state name!") +
+  theme(plot.title = element_text(size = 16, face ="bold", margin = margin(0,0,10,0), hjust=0.5),
+        plot.subtitle = element_text(size = 10, face ="bold", margin = margin(0,0,10,0), hjust=0.5))
