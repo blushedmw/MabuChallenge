@@ -3,3 +3,6 @@
 
 ### 8월 2주
 - 데이터: 2023-08-01 Tidytuesday 데이터 'US States' (states.csv & state_name_etymology.csv)
+
+### 8월 3주
+- 데이터: NCDC International Best Track Archive for Climate Stewardship (ibtracs.WP.list.v04r00.csv) 8/14 download ver.
