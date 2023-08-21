@@ -1,0 +1,51 @@
+library(tidyverse)
+library(readxl)
+library(ggOceanMaps)
+library(ggrepel)
+
+tp <- read_csv('ibtracs.WP.list.v04r00.csv')
+tp_2 <- tp[-1,]
+TP.df <- as_tibble(tp_2)
+
+TP.df$LAT <- as.double(TP.df$LAT)
+TP.df$LON <- as.double(TP.df$LON)
+TP.df <- TP.df %>% mutate(ID = as.factor(paste(NAME, SEASON, sep = ".")))
+
+#2020년대 태풍 고르기
+TP.2020 <- TP.df %>% filter(year(ISO_TIME)>=2020 &
+														NAME!="NOT_NAMED") %>%
+	mutate(color = ifelse(ID %in% c('KHANUN.2023',
+			'AERE.2022','SONGDA.2022','TRASES.2022','HINNAMNOR.2022','NANMADOL.2022',
+			'LUPIT.2021','OMAIS.2021','CHANTHU.2021',
+			'JANGMI.2020','BAVI.2020','MAYSAK.2020','HAISHEN.2020'), 'O','X'))
+
+#시작점 & 라벨 붙이기용
+#시작 지점 찾기
+TP.2020.point <- TP.2020 %>% filter(ID %in% c('KHANUN.2023',
+			'AERE.2022','SONGDA.2022','TRASES.2022','HINNAMNOR.2022','NANMADOL.2022',
+			'LUPIT.2021','OMAIS.2021','CHANTHU.2021',
+			'JANGMI.2020','BAVI.2020','MAYSAK.2020','HAISHEN.2020')) %>%
+	group_by(ID) %>%
+	summarize(min_dat = min(ISO_TIME))
+
+#2020년대 태풍 데이터에서 일치하는 행 찾기
+index.2020 <- c()
+
+for (i in 1:length(TP.point$min_dat)){
+	r_num <- which(TP.2020$ISO_TIME == TP.2020.point$min_dat[i] & TP.2020$ID == TP.2020.point$ID[i])
+	index.2020[i] <- r_num
+}
+
+#찾은 행 번호만 골라 라벨+점찍기용 df 만들기
+TP.2020.label <- TP.2020[c(3517,418,2701,588,3693,277,4519,2203,491,3874,2418,3584,3609),]
+
+#그리기
+basemap(limits = c(90,180,0,65), land.col="grey90", land.border.col = "grey90")+
+	geom_path(data=TP.2020, aes(x=LON, y=LAT, group=ID, color=color), alpha=0.7)+
+	scale_color_manual(values = c('red','grey50')) +
+	geom_point(data=TP.2020.label, aes(x=LON, y=LAT), size=1.5) +
+	geom_text_repel(data=TP.2020.label, aes(x=LON, y=LAT,label=NAME), size=3, vjust=-1)+
+	facet_wrap(~SEASON) +
+	labs(title = "2020s Typhoon", subtitle = "Red: Typhoons that affected Korea") +
+	theme(plot.title = element_text(size=15, hjust=0.5),
+				plot.subtitle = element_text(size=12, hjust=0.5))
