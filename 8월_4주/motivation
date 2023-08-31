@@ -1,0 +1,57 @@
+#install.packages('treemapify')
+library(treemapify)
+library(tidyverse)
+library(readxl)
+library(stringr)
+
+murderdb <- read_xlsx('Violence Project Mass Shooter Database - Version 7 5.28.23.xlsx', sheet=5)
+murderdb <- murderdb[-1,]
+glimpse(murderdb)
+
+colnames(murderdb)[126] <- 'Motive: Interpersonal Conflict'
+colnames(murderdb)[128] <- 'Other'
+
+murderdb <- murderdb %>% mutate(motivation=case_when(
+  `Motive: Racism/Xenophobia`==1 ~'Racism(Targeting people of color)',
+  `Motive: Racism/Xenophobia`==2 ~'Racism(Targeting white people)',
+  `Motive: Religious Hate` %in% 1:4~'Religious hate',
+  `Motive: Misogyny`==1~'Misogyny',
+  `Motive: Homophobia`==1~'Homophobia',
+  `Motive: Employment Issue`==1~'Employment Issue',
+  `Motive: Economic Issue`==1~'Economic Issue',
+  `Motive: Legal Issue`==1~'Legal Issue',
+  `Motive: Relationship Issue`==1~'Relationship Issue',
+  `Motive: Interpersonal Conflict`==1~'Interpersonal Conflict',
+  `Motive: Fame-Seeking`==1~'Fame-Seeking',
+  `Other`==1~'Other',
+  `Other`==2~'Generalized anger',
+  `Motive: Unknown`==1~'Unknown',
+  TRUE~'Unknown'
+))
+
+cols <- c('Racism(Targeting people of color)'='#C24242',
+          'Racism(Targeting white people)'='#C23400',
+          'Religious hate'='#E03C00',
+          'Misogyny'='#852300',
+          'Homophobia'='#855848',
+          'Employment Issue'='#852859',
+          'Economic Issue'='#A32E6C',
+          'Legal Issue'='#C2106F',
+          'Relationship Issue'='#FF8F66',
+          'Interpersonal Conflict'='#FFB499',
+          'Fame-Seeking'='#FF33A0',
+          'Other'='#696969',
+          'Generalized anger'='black',
+          'Unknown'='#A9A9A9')
+
+murderdb %>% count(motivation) %>%
+  mutate(percent = n/sum(n)*100,
+         pc_text = paste('(',as.character(round(percent,2)),'%)',sep='')) %>%
+  ggplot(aes(area=n, fill=motivation)) +
+  geom_treemap()+
+  geom_treemap_text(aes(label=paste(motivation, pc_text, sep='\n')), color='white')+
+  labs(title="Motivation of mass shooting", subtitle='Shootings from 1966 to 2022')+
+  theme(text = element_text(family = "AppleGothic"),
+        plot.title = element_text(size = 20, hjust=0.5),
+        plot.subtitle = element_text(size = 15, hjust=0.5))+
+  scale_fill_manual(values=cols)
