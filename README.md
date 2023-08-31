@@ -7,3 +7,6 @@
 ### 8월 3주
 - 데이터: NCDC International Best Track Archive for Climate Stewardship (ibtracs.WP.list.v04r00.csv) 8/14 download ver.
   (https://drive.google.com/file/d/1lnR8BpvsWVaUjMy6ErAbk1GcBx1tFpvN/view?usp=drive_link) <- 8/17 download ver.
+
+### 8월 4주
+- 데이터: The Violence Project: Mass Shooting Data (Violence Project Mass Shooter Database - Version 7 5.28.23.xlsx)
