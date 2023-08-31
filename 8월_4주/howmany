@@ -1,0 +1,38 @@
+library(tidyverse)
+library(readxl)
+library(stringr)
+
+#the violence project - mass shooter database
+GV <- read_xlsx('Violence Project Mass Shooter Database - Version 7 5.28.23.xlsx', sheet=9)
+glimpse(GV)
+GV_2 <- GV[1:57,]
+
+GV_2$`Mass Shootings (Incidents)` <- as.numeric(GV_2$`Mass Shootings (Incidents)`)
+GV_2$Year <- as.numeric(GV_2$Year)
+GV_2$`Total U.S. Murders (FBI UCR)` <- as.numeric(GV_2$`Total U.S. Murders (FBI UCR)`)
+GV_2$`U.S. Murder Rate per Million` <- as.numeric(GV_2$`U.S. Murder Rate per Million`)
+GV_2$`Deaths per Mass Shooting (Mean)` <- as.numeric(GV_2$`Deaths per Mass Shooting (Mean)`)
+
+glimpse(GV_2)
+
+#전체 사망자
+GV_2 %>% ggplot(aes(x=Year, y=`Mass Shootings (Incidents)`)) +
+  geom_col(fill='#b04141') +
+  geom_point(aes(y=-0.3, size=`Mass Shooting Deaths (Total)`, color=`Mass Shooting Deaths (Total)`), alpha=0.9) +
+  scale_color_continuous(low='#ffd6d6', high='#b00000')+
+  theme_minimal()+
+  labs(title = "1966~2022 Mass shooting in US") +
+  theme(text = element_text(family = "AppleGothic"),
+        plot.title = element_text(size=15, hjust=0.5),
+  )
+
+#건수별 사망자
+GV_2 %>% ggplot(aes(x=Year, y=`Mass Shootings (Incidents)`)) +
+  geom_col(fill='#b04141') +
+  geom_point(aes(y=-0.3, size=`Deaths per Mass Shooting (Mean)`, color=`Deaths per Mass Shooting (Mean)`), alpha=0.9) +
+  scale_color_continuous(low='#ffd6d6', high='#b00000')+
+  theme_minimal()+
+  labs(title = "1966~2022 Mass shooting in US") +
+  theme(text = element_text(family = "AppleGothic"),
+        plot.title = element_text(size=15, hjust=0.5),
+  )
