@@ -1,0 +1,41 @@
+#install.packages('remotes')
+#library(remotes)
+#install_github("AllanCameron/geomtextpath")
+
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(geomtextpath)
+
+jap_tri <- read.delim(pipe("pbpaste"), header=TRUE)
+glimpse(jap_tri)
+jap_tri[jap_tri == 'ND'] <- ""
+
+
+#기본 스케일
+jap_tri %>% mutate(tri = as.double(X3H.radioactivity.concentration..Bq.L.),
+                   date = as_date(Sampling.date)) %>%
+  ggplot(aes(x=date, group=Sampling.point.number, color=Sampling.point.number)) +
+  geom_point(aes(y=tri)) +
+  scale_x_date(limits=c(as.Date("2011-03-01"), as.Date("2023-05-01")))+
+  geom_textvline(label="Fukushima nuclear disaster",xintercept=as.numeric(as.Date('2011-03-11')), color='darkorchid4', size=5, linewidth=1)+
+  theme_minimal()+
+  labs(title = "3H radioactivity concentration near FDNPP",
+       x='Sampling date',
+       y='3H radioactivity concentration (Bq/L)') +
+  theme(plot.title = element_text(hjust=0.5, size=15))
+
+#700
+jap_tri %>% mutate(tri = as.double(X3H.radioactivity.concentration..Bq.L.),
+                   date = as_date(Sampling.date)) %>%
+  ggplot(aes(x=date, group=Sampling.point.number, color=Sampling.point.number)) +
+  geom_point(aes(y=tri)) +
+  scale_x_date(limits=c(as.Date("2011-03-01"), as.Date("2023-05-01")))+
+  geom_textvline(label="Fukushima nuclear disaster",xintercept=as.numeric(as.Date('2011-03-11')), color='darkorchid4', size=5, linewidth=1)+
+  scale_y_continuous(limits=c(0,700))+
+  geom_texthline(label="limit of 3H (10km near water release point)", yintercept=700, linetype="dotted", color='red')+
+  theme_minimal()+
+  labs(title = "3H radioactivity concentration near FDNPP",
+       x='Sampling date',
+       y='3H radioactivity concentration (Bq/L)') +
+  theme(plot.title = element_text(hjust=0.5, size=15))
