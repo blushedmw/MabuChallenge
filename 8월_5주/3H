@@ -32,8 +32,8 @@ jap_tri %>% mutate(tri = as.double(X3H.radioactivity.concentration..Bq.L.),
   geom_point(aes(y=tri)) +
   scale_x_date(limits=c(as.Date("2011-03-01"), as.Date("2023-05-01")))+
   geom_textvline(label="Fukushima nuclear disaster",xintercept=as.numeric(as.Date('2011-03-11')), color='darkorchid4', size=5, linewidth=1)+
-  scale_y_continuous(limits=c(0,700))+
-  geom_texthline(label="limit of 3H (10km near water release point)", yintercept=700, linetype="dotted", color='red')+
+  scale_y_continuous(limits=c(0,30))+
+  geom_texthline(label="limit of 3H (10km near water release point)", yintercept=30, linetype="dotted", color='red')+
   theme_minimal()+
   labs(title = "3H radioactivity concentration near FDNPP",
        x='Sampling date',
