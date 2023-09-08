@@ -10,3 +10,6 @@
 
 ### 8월 4주
 - 데이터: The Violence Project: Mass Shooting Data (Violence Project Mass Shooter Database - Version 7 5.28.23.xlsx)
+
+### 8월 5주
+- 데이터: Japan Radioactivity Data (close1F_water__including total.xlsx)
