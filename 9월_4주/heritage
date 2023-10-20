@@ -1,0 +1,25 @@
+#waffle chart
+heritage_sep <- heritage %>% separate(col=분류, into=c('first','second','third'), sep='/') %>%
+	select(-c('first', 'second'))
+
+heritage_sep[872, 'third'] = '종교시설'
+heritage_sep[884, 'third'] = '종교시설'
+heritage_sep[871, 'third'] = '근대교통·통신시설'
+heritage_sep[873, 'third'] = '교육시설'
+heritage_sep[494, 'third'] = '인물기념시설'
+#heritage_sep %>% filter(third == '인물기념') %>% View()
+
+heritage_waffle <- heritage_sep %>% filter(str_detect(third,'시설')) %>% count(third)
+
+heritage_waffle_kind <- as.vector(heritage_waffle$third)
+heritage_waffle_n <- as.vector(heritage_waffle$n)
+
+names(heritage_waffle_n) <- heritage_waffle_kind
+color = hcl.colors(length(heritage_waffle_n), palette = "Roma")
+
+waffle(heritage_waffle_n, rows=13, colors = color, flip=TRUE) +
+	labs(title = "국가 등록문화재",
+		   subtitle = "시설 관련 문화재만 포함. 2002-02-28 ~ 2023-09-26") +
+	theme(text = element_text(family = "AppleGothic"),
+				plot.title = element_text(hjust=0.5),
+				plot.subtitle = element_text(hjust=0.5))
