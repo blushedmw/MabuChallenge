@@ -1,0 +1,71 @@
+library(tidyverse)
+library(lubridate)
+library(readxl)
+
+dsat <- read_xlsx('dsat_dist_2020_10.xlsx',sheet=2)
+
+#그냥 geom_col 버전
+dsat %>% filter(admin0_txt %in% c("Israel","Palestine")) %>%
+  mutate(attack_date_month = as_date(paste(as.character(date_year),'-',as.character(date_month),'-01')),
+         wounded_high_rev = (-1)*wounded_high,
+         killed_high_rev = (-1)*killed_high,
+         killed_high_civilian_rev = (-1)*killed_high_civilian) %>%
+  group_by(attack_date_month) %>% summarize(wdd_s = sum(wounded_high_rev),
+                                            kill_s = sum(killed_high_rev),
+                                            kill_c_s = sum(killed_high_civilian_rev)) %>%
+  filter((attack_date_month >= as_date('2000-01-01')) & (attack_date_month <= as_date('2006-01-01'))) %>%
+  ggplot(aes(x=attack_date_month)) +
+  geom_col(aes(y=wdd_s), fill='red') +
+  geom_col(aes(y=kill_s), fill='red4') +
+  geom_col(aes(y=kill_c_s), fill='red3') +
+  theme_minimal() +
+  labs(title = 'Israel-Palestine Bloody toll',
+       subtitle = '2000~2005') +
+  theme(plot.title = element_text(hjust=0.5),
+        plot.subtitle = element_text(hjust=0.5))
+
+#geom_chicklet 버전
+install.packages("ggchicklet",
+                 repos = "https://cinc.rud.is")
+library(ggchicklet)
+library(grid)
+
+dsat %>% filter(admin0_txt %in% c("Israel","Palestine")) %>%
+  mutate(attack_date_month = as_date(paste(as.character(date_year),'-',as.character(date_month),'-01')),
+         wounded_high_rev = (-1)*wounded_high,
+         killed_high_rev = (-1)*killed_high,
+         killed_high_civilian_rev = (-1)*killed_high_civilian) %>%
+  group_by(attack_date_month) %>% summarize(wdd_s = sum(wounded_high_rev),
+                                            kill_s = sum(killed_high_rev),
+                                            kill_c_s = sum(killed_high_civilian_rev)) %>%
+  filter((attack_date_month >= as_date('2000-01-01')) & (attack_date_month <= as_date('2006-01-01'))) %>%
+  ggplot(aes(x=attack_date_month)) +
+  geom_chicklet(aes(y=wdd_s), fill='red', color='red') +
+  geom_chicklet(aes(y=kill_s), fill='red4', color='red4') +
+  geom_chicklet(aes(y=kill_c_s), fill='red3', color='red3') +
+  theme_minimal() +
+  labs(title = 'Israel-Palestine Bloody toll',
+       subtitle = '2000~2005') +
+  theme(plot.title = element_text(hjust=0.5),
+        plot.subtitle = element_text(hjust=0.5))
+
+#geom_chicklet_오류수정
+dsat %>% filter(admin0_txt %in% c("Israel","Palestine")) %>%
+  mutate(attack_date_month = as_date(paste(as.character(date_year),'-',as.character(date_month),'-01')),
+         damaged = wounded_high+killed_high) %>%
+  group_by(attack_date_month) %>% summarize(dmg_s = sum(damaged),
+                                            kill_s = sum(killed_high),
+                                            kill_c_s = sum(killed_high_civilian)) %>%
+  filter((attack_date_month >= as_date('2000-01-01')) & (attack_date_month < as_date('2006-01-01'))) %>%
+  ggplot(aes(x=attack_date_month)) +
+  geom_chicklet(aes(y=dmg_s), fill='red', color='red', radius=unit(0.3,'mm'), width=30) +
+  geom_chicklet(aes(y=kill_s), fill='red4', color='red4', radius=unit(0.3,'mm'), width=30) +
+  geom_chicklet(aes(y=kill_c_s), fill='red3', color='red3', radius=unit(0.3,'mm'), width=30) +
+  theme_minimal() +
+  scale_x_date(position = "top", breaks = "1 year", date_labels = "%Y") +
+  scale_y_reverse()+
+  labs(title = 'Israel-Palestine Bloody toll',
+       subtitle = '2000~2005',
+       x= 'Year', y= 'How many') +
+  theme(plot.title = element_text(hjust=0.5),
+        plot.subtitle = element_text(hjust=0.5))
