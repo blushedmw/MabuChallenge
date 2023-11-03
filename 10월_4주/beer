@@ -1,0 +1,30 @@
+library(tidyverse)
+library(readxl)
+library(stringr)
+
+beer <- read.delim(pipe("pbpaste"), header = TRUE)
+beer_per <- read.delim(pipe("pbpaste"),header = TRUE)
+beer_per$country <- str_to_title(beer_per$country)
+
+beer_merge <- inner_join(beer, beer_per, by='country')
+glimpse(beer_merge)
+
+y_vec <- as_vector(runif(12, min=-0.7, max=0.7))
+beer_merge$y <- y_vec
+
+beer_merge %>% ggplot(aes(x=reorder(country,-X2021_total.thousand.), y=y)) +
+  geom_point(aes(size=X2021_total.thousand.), color='goldenrod', alpha=0.6) +
+  geom_point(aes(size=consumption.volume.L.), color = 'white', alpha=0.7) +
+  scale_size_continuous(range=c(1,100)) +
+  scale_y_continuous(limits=c(-0.7,0.7))+
+  theme_minimal() +
+  labs(title = "Global Beer Consumption",
+       subtitle = "Yellow - Total country consumption / White - Per Capita consumption",
+       x= "Country") +
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(hjust=0.5, face = "bold"),
+        plot.subtitle = element_text(hjust=0.5),
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        legend.position = "none",
+        plot.margin = unit(c(1, 1, 1, 1), "cm"))
